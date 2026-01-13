@@ -22,18 +22,21 @@ class ItemRow(TypedDict):
     name: str
     classification: NotRequired[str]
     addresses: NotRequired[AddressMap]
+    tags: NotRequired[list[str]]
 
 
 class LocationRow(TypedDict, total=False):
     key: str
     name: str
     addresses: NotRequired[AddressMap]
+    tags: NotRequired[list[str]]
 
 
 class GoalRow(TypedDict, total=False):
     key: str
     name: str
     addresses: NotRequired[AddressMap]
+    tags: NotRequired[list[str]]
 
 
 @dataclass(frozen=True)

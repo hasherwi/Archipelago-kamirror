@@ -9,6 +9,8 @@ locations:
     eu: null
     jp: null
     vc: null
+  tags:
+    - poc
 - key: test_location_2
   name: Test Location 2
   addresses:
@@ -16,6 +18,8 @@ locations:
     eu: null
     jp: null
     vc: null
+  tags:
+    - poc
 - key: big_button_1_15
   name: Big Button 1-15
   addresses:

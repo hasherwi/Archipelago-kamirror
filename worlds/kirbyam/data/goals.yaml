@@ -2,6 +2,15 @@
 # schema_version increments only when the YAML structure meaningfully changes.
 schema_version: 1
 goals:
+- key: move_to_room_1
+  name: Move to Room 1
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  tags:
+    - poc
 - key: defeat_dark_mind
   name: Defeat Dark Mind
   logic_notes: Collect All Mirror Shards

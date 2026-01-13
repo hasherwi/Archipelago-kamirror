@@ -10,6 +10,8 @@ items:
     eu: null
     jp: null
     vc: null
+  tags:
+    - poc
 - key: test_filler
   name: Test Filler
   classification: filler
@@ -18,6 +20,8 @@ items:
     eu: null
     jp: null
     vc: null
+  tags:
+    - poc
 - key: battles_notes
   name: Battles Notes
   classification: filler

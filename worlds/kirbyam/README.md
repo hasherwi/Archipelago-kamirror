@@ -39,7 +39,7 @@ Typical structure (may evolve as implementation grows):
   - `__init__.py` – World entrypoint
   - `items.py`, `locations.py`, `regions.py`, `rules.py`, `options.py` – modular world code
   - `docs/` – world docs rendered by WebHost
-  - `research/` – data used to create the logic
+  - `data/` – data used to create the logic
   - `test/` – unit tests for logic and edge cases
   - `requirements.txt` – world-specific dependencies (if needed)
 - `client/` (optional, if kept here) – BizHawk Lua client scripts and support files

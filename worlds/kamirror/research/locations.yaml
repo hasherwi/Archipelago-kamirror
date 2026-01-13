@@ -1,0 +1,450 @@
+schema_version: 1
+locations:
+- key: big_button_1_15
+  name: Big Button 1-15
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_1_19
+  name: Big Button 1-19
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_1_43
+  name: Big Button 1-43
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_1_9
+  name: Big Button 1-9
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_2_6
+  name: Big Button 2-6
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_3_1
+  name: Big Button 3-1
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_3_16
+  name: Big Button 3-16
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_3_8
+  name: Big Button 3-8
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_4_14
+  name: Big Button 4-14
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_5_5
+  name: Big Button 5-5
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_6_11
+  name: Big Button 6-11
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_7_12
+  name: Big Button 7-12
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_7_20
+  name: Big Button 7-20
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_8_12
+  name: Big Button 8-12
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_button_9_6
+  name: Big Button 9-6
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_1_9
+  name: Big Chest 1-9
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_2_1
+  name: Big Chest 2-1
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_3_7
+  name: Big Chest 3-7
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_4_1_24
+  name: Big Chest 4-(1-24)
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_5_15
+  name: Big Chest 5-15
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_5_23
+  name: Big Chest 5-23
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_6_15
+  name: Big Chest 6-15
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_6_21
+  name: Big Chest 6-21
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_7_4
+  name: Big Chest 7-4
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_8_4
+  name: Big Chest 8-4
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_8_8_20
+  name: Big Chest 8-(8-20)
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_9_18
+  name: Big Chest 9-18
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_9_4
+  name: Big Chest 9-4
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: big_chest_9_8
+  name: Big Chest 9-8
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_1_28
+  name: Chest 1-28
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_2_12
+  name: Chest 2-12
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_2_21
+  name: Chest 2-21
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_2_25
+  name: Chest 2-25
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_3_15
+  name: Chest 3-15
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_3_18
+  name: Chest 3-18
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_3_6
+  name: Chest 3-6
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_3_9
+  name: Chest 3-9
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_4_23
+  name: Chest 4-23
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_5_18
+  name: Chest 5-18
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_5_9
+  name: Chest 5-9
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_6_28
+  name: Chest 6-28
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_6_6
+  name: Chest 6-6
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_7_11
+  name: Chest 7-11
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_7_15
+  name: Chest 7-15
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_7_25
+  name: Chest 7-25
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_7_6
+  name: Chest 7-6
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_7_9
+  name: Chest 7-9
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_8_26
+  name: Chest 8-26
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_8_9
+  name: Chest 8-9
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_9_23
+  name: Chest 9-23
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_9_8
+  name: Chest 9-8
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chest_9_9
+  name: Chest 9-9
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_dark_meta_knight
+  name: Defeat Dark Meta Knight
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_gobbler
+  name: Defeat Gobbler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_king_golem
+  name: Defeat King Golem
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_kracko
+  name: Defeat Kracko
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_master_hand_crazy_hand
+  name: Defeat Master Hand & Crazy Hand
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_mega_titan
+  name: Defeat Mega Titan
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_moley
+  name: Defeat Moley
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: defeat_wiz
+  name: Defeat Wiz
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: door_switch_2_3
+  name: Door Switch 2-3
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: door_switch_5_6
+  name: Door Switch 5-6
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: door_switch_6_26
+  name: Door Switch 6-26
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: door_switch_8_15
+  name: Door Switch 8-15
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null

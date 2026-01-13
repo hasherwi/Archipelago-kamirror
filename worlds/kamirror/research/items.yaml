@@ -1,0 +1,663 @@
+schema_version: 1
+items:
+- key: battles_notes
+  name: Battles Notes
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Red
+- key: beginning_notes
+  name: Beginning Notes
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: White
+- key: cabbage_cavern_map
+  name: Cabbage Cavern Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: cabbage_cavern_mirror_shard
+  name: Cabbage Cavern Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: candy_constellation_map
+  name: Candy Constellation Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: candy_constellation_mirror_shard
+  name: Candy Constellation Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: carbon_color_spray
+  name: Carbon Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: carrot_castle_map
+  name: Carrot Castle Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: carrot_castle_mirror_shard
+  name: Carrot Castle Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: cell_phone_charge
+  name: Cell Phone Charge
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Should we drop the item or manipulate the value?
+- key: cell_phone_decharge
+  name: Cell Phone Decharge
+  classification: trap
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chalk_color_spray
+  name: Chalk Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: cherry_color_spray
+  name: Cherry Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: chocolate_color_spray
+  name: Chocolate Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: dream_notes
+  name: Dream Notes
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Teal
+- key: emerald_color_spray
+  name: Emerald Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: enemy_sounds
+  name: Enemy Sounds
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Orange
+- key: grape_color_spray
+  name: Grape Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: green_color_spray
+  name: Green Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: happy_notes
+  name: Happy Notes
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Yellow
+- key: heart_meter_5_23
+  name: Heart Meter 5-23
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: heart_meter_6_21
+  name: Heart Meter 6-21
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: heart_meter_8_4
+  name: Heart Meter 8-4
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: heart_meter_9_8
+  name: Heart Meter 9-8
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: health_increase
+  name: Health Increase
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Should we drop the item or manipulate the value?
+- key: health_decrease
+  name: Health Decrease
+  classification: trap
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: instant_death
+  name: Instant Death
+  classification: trap
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: kirby_s_sounds
+  name: Kirby's Sounds
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Pink
+- key: lives_increase
+  name: Lives Increase
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Should we drop the item or manipulate the value?
+- key: lives_decrease
+  name: Lives Decrease
+  classification: trap
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: magic_roulette_1up
+  name: 'Magic Roulette: 1UP'
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: magic_roulette_candy
+  name: 'Magic Roulette: Candy'
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: magic_roulette_cherries
+  name: 'Magic Roulette: Cherries'
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: magic_roulette_galaxia
+  name: 'Magic Roulette: Galaxia'
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: magic_roulette_random_ability
+  name: 'Magic Roulette: Random Ability'
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_1_15
+  name: Mirror 1-15
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_1_19
+  name: Mirror 1-19
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_1_43
+  name: Mirror 1-43
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_1_9
+  name: Mirror 1-9
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_2_6
+  name: Mirror 2-6
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_3_1
+  name: Mirror 3-1
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_3_16
+  name: Mirror 3-16
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_3_8
+  name: Mirror 3-8
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_4_14
+  name: Mirror 4-14
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_5_5
+  name: Mirror 5-5
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_6_11
+  name: Mirror 6-11
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_7_12
+  name: Mirror 7-12
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_7_20
+  name: Mirror 7-20
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_8_12
+  name: Mirror 8-12
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mirror_9_6
+  name: Mirror 9-6
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: moonlight_mansion_map
+  name: Moonlight Mansion Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: moonlight_mansion_mirror_shard
+  name: Moonlight Mansion Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mustard_mountain_map
+  name: Mustard Mountain Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: mustard_mountain_mirror_shard
+  name: Mustard Mountain Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: ocean_color_spray
+  name: Ocean Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: olive_ocean_map
+  name: Olive Ocean Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: olive_ocean_mirror_shard
+  name: Olive Ocean Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: open_door_2_3
+  name: Open Door 2-3
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  logic_notes: What locations are locked behind these?
+  dev_notes: If it blocks no locations, it should only be "useful".
+- key: open_door_5_6
+  name: Open Door 5-6
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  logic_notes: What locations are locked behind these?
+  dev_notes: If it blocks no locations, it should only be "useful".
+- key: open_door_6_26
+  name: Open Door 6-26
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  logic_notes: What locations are locked behind these?
+  dev_notes: If it blocks no locations, it should only be "useful".
+- key: open_door_8_15
+  name: Open Door 8-15
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  logic_notes: What locations are locked behind these?
+  dev_notes: If it blocks no locations, it should only be "useful".
+- key: orange_color_spray
+  name: Orange Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: peppermint_palace_map
+  name: Peppermint Palace Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: peppermint_palace_mirror_shard
+  name: Peppermint Palace Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: pink_color_spray
+  name: Pink Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: radish_ruins_map
+  name: Radish Ruins Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: radish_ruins_mirror_shard
+  name: Radish Ruins Mirror Shard
+  classification: progression
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: rainbow_route_map
+  name: Rainbow Route Map
+  classification: useful
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: red_color_spray
+  name: Red Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: remove_ability
+  name: Remove Ability
+  classification: trap
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: sapphire_color_spray
+  name: Sapphire Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: secret_notes
+  name: Secret Notes
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Purple
+- key: secret_sounds
+  name: Secret Sounds
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Dark Blue
+- key: snow_color_spray
+  name: Snow Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: sound_effects
+  name: Sound Effects
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Light Blue
+- key: sound_player
+  name: Sound Player
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: spawn_enemies
+  name: Spawn Enemies
+  classification: trap
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: spunky_notes
+  name: Spunky Notes
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+  dev_notes: Green
+- key: summon_kirbys
+  name: Summon Kirbys
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
+- key: yellow_color_spray
+  name: Yellow Color Spray
+  classification: filler
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null

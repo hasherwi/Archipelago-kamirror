@@ -7,7 +7,7 @@ from worlds.AutoWorld import WebWorld, World
 from worlds.celeste_open_world import data
 
 from .data_loader import load_kirbyam_data, KirbyAMData
-from .id_map import build_id_map, build_item_key_to_id, build_location_key_to_id
+from .id_map import build_id_map
 
 GAME_NAME = "Kirby & The Amazing Mirror"
 
@@ -66,24 +66,32 @@ class KirbyAMWorld(World):
         self._data = load_kirbyam_data()
         data = self._data
 
-        # 1) Build deterministic key->id maps (however you're currently doing it)
-        item_key_to_id = build_item_key_to_id(data.items)
-        loc_key_to_id = build_location_key_to_id(data.locations)
+        # Build key->id maps FIRST
+        item_key_to_id = build_id_map(
+            (row["key"] for row in data.items if "key" in row),
+            base_id=23_460_000,
+            namespace="kirbyam:item",
+        )
+        loc_key_to_id = build_id_map(
+            (row["key"] for row in data.locations if "key" in row),
+            base_id=23_450_000,
+            namespace="kirbyam:location",
+        )
 
-        # 2) Build Archipelago-required name->id maps
-        self.item_name_to_id = {row["name"]: item_key_to_id[row["key"]] for row in data.items if "name" in row}
-        self.location_name_to_id = {row["name"]: loc_key_to_id[row["key"]] for row in data.locations if "name" in row}
+        # Then build name->id maps from those
+        self.item_name_to_id = {row["name"]: item_key_to_id[row["key"]] for row in data.items if "key" in row and "name" in row}
+        self.location_name_to_id = {row["name"]: loc_key_to_id[row["key"]] for row in data.locations if "key" in row and "name" in row}
 
-        # 3) Now compute POC sets from tags
-        self._poc_location_names = [row["name"] for row in data.locations if "poc" in row.get("tags", [])]
-        self._poc_item_names = [row["name"] for row in data.items if "poc" in row.get("tags", [])]
+        # Then compute POC lists
+        self._poc_location_names = [row["name"] for row in data.locations if "poc" in row.get("tags", []) and "name" in row]
+        self._poc_item_names = [row["name"] for row in data.items if "poc" in row.get("tags", []) and "name" in row]
 
         if not self._poc_location_names:
             raise ValueError("No locations tagged 'poc' found in locations.yaml")
         if not self._poc_item_names:
             raise ValueError("No items tagged 'poc' found in items.yaml")
 
-        # 4) Validate that POC names exist in the maps we just built
+        # Validate that POC names exist in the maps we just built
         missing_loc_ids = [n for n in self._poc_location_names if n not in self.location_name_to_id]
         missing_item_ids = [n for n in self._poc_item_names if n not in self.item_name_to_id]
         if missing_loc_ids:

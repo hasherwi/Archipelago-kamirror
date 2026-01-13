@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from BaseClasses import Item, ItemClassification, Location, Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 
-from .data_loader import load_kirbyam_data
+from .data_loader import load_kirbyam_data, KirbyAMData
 from .id_map import build_id_map
 
 GAME_NAME = "Kirby & The Amazing Mirror"
@@ -30,6 +30,8 @@ class KirbyAMWebWorld(WebWorld):
 
 
 class KirbyAMWorld(World):
+    _data: KirbyAMData
+    
     game = GAME_NAME
     web = KirbyAMWebWorld()
 
@@ -100,7 +102,7 @@ class KirbyAMWorld(World):
         # construction and real location placement.
 
         data = self._data
-        poc_location_names = [row["name"] for row in data.locations if "poc" in row.get("tags", []) and (name := row.get("name")) is not None]
+        poc_location_names = [name for row in data.locations if "poc" in row.get("tags", []) and (name := row.get("name")) is not None]
         
         missing = [n for n in poc_location_names if n not in self.location_name_to_id]
         if missing:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TypedDict, Literal
+from typing import TypedDict, NotRequired, Optional, Literal, List, Dict, Any, cast
 
 import yaml
 
@@ -17,23 +17,23 @@ class AddressMap(TypedDict, total=False):
     vc: Optional[int]
 
 
-class ItemRow(TypedDict, total=False):
+class ItemRow(TypedDict):
     key: str
     name: str
-    classification: str
-    addresses: AddressMap
+    classification: NotRequired[str]
+    addresses: NotRequired[AddressMap]
 
 
 class LocationRow(TypedDict, total=False):
     key: str
     name: str
-    addresses: AddressMap
+    addresses: NotRequired[AddressMap]
 
 
 class GoalRow(TypedDict, total=False):
     key: str
     name: str
-    addresses: AddressMap
+    addresses: NotRequired[AddressMap]
 
 
 @dataclass(frozen=True)
@@ -177,7 +177,7 @@ def load_kirbyam_data() -> KirbyAMData:
 
     return KirbyAMData(
         schema_version=items_schema,
-        items=items,  # type: ignore[arg-type]
-        locations=locations,  # type: ignore[arg-type]
-        goals=goals,  # type: ignore[arg-type]
+        items=cast(List[ItemRow], items),
+        locations=cast(List[LocationRow], locations),
+        goals=cast(List[GoalRow], goals)
     )

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from BaseClasses import Item, ItemClassification, Location, Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 
+from .data_loader import load_kirbyam_data
+from .id_map import build_id_map
 
 GAME_NAME = "Kirby & The Amazing Mirror"
 
@@ -30,32 +32,54 @@ class KirbyAMWorld(World):
     web = KirbyAMWebWorld()
 
     origin_region_name = "Menu"
+    
+    # Deterministic base IDs. Do not change once you have public releases.
+    _base_location_id = 23_450_000
+    _base_item_id = 23_460_000
 
-    # Minimal stable ID mappings for POC
-    # Keep these stable once published (clients/trackers will depend on them).
-    _base_location_id = 12_345_000
-    _base_item_id = 12_346_000
+    # These are populated from YAML in generate_early()
+    item_name_to_id: Dict[str, int] = {}
+    location_name_to_id: Dict[str, int] = {}
 
-    # Note: event locations/items (Victory) do not need numeric IDs.
-    location_name_to_id = {
-        "Test Location 1": _base_location_id + 1,
-        "Test Location 2": _base_location_id + 2,
-    }
+    def generate_early(self) -> None:
+        """
+        Load canonical YAML and build deterministic name->id maps.
+        This runs early in generation and will fail fast if YAML is invalid.
+        """
+        data = load_kirbyam_data()
 
-    item_name_to_id = {
-        "Test Progression": _base_item_id + 1,
-        "Test Filler": _base_item_id + 2,
-    }
+        # Build stable ID maps by YAML key, then convert to name->id (AP expects names).
+        item_keys = [row["key"] for row in data.items]
+        loc_keys = [row["key"] for row in data.locations]
+
+        item_key_to_id = build_id_map(item_keys, self._base_item_id, "kirbyam:item")
+        loc_key_to_id = build_id_map(loc_keys, self._base_location_id, "kirbyam:location")
+
+        # Convert key->id to name->id using YAML "name"
+        self.item_name_to_id = {row["name"]: item_key_to_id[row["key"]] for row in data.items}
+        self.location_name_to_id = {row["name"]: loc_key_to_id[row["key"]] for row in data.locations}
+
+        # Ensure our POC names exist in YAML (optional but strongly recommended).
+        # This prevents drift between POC code and data files.
+        required_items = {"Test Progression", "Test Filler"}
+        required_locations = {"Test Location 1", "Test Location 2"}
+
+        missing_items = required_items.difference(self.item_name_to_id.keys())
+        missing_locations = required_locations.difference(self.location_name_to_id.keys())
+
+        if missing_items:
+            raise ValueError(f"POC requires these items to exist in items.yaml: {sorted(missing_items)}")
+        if missing_locations:
+            raise ValueError(f"POC requires these locations to exist in locations.yaml: {sorted(missing_locations)}")
 
     def create_regions(self) -> None:
         menu = Region(self.origin_region_name, self.player, self.multiworld)
         main = Region("Main Area", self.player, self.multiworld)
 
         # Connect Menu -> Main Area
-        menu_to_main = menu.connect(main, "To Main Area")
-        # No rule: always accessible for POC
+        menu.connect(main, "To Main Area")
 
-        # Add two test locations in Main Area
+        # POC locations (IDs now come from YAML-generated mapping)
         main.locations.append(
             Location(
                 self.player,
@@ -73,7 +97,7 @@ class KirbyAMWorld(World):
             )
         )
 
-        # Add completion event location in Menu (not part of mapping)
+        # Victory event location (event locations/items do not need numeric IDs)
         victory_event = Location(self.player, "Victory", None, menu)
         victory_event.place_locked_item(self._create_event_item("Victory"))
         menu.locations.append(victory_event)
@@ -87,7 +111,6 @@ class KirbyAMWorld(World):
         self.multiworld.itempool.append(self.create_item("Test Filler"))
 
     def set_rules(self) -> None:
-        # Minimal completion: require the event item "Victory"
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
 
     def create_item(self, name: str) -> Item:
@@ -98,7 +121,6 @@ class KirbyAMWorld(World):
         return Item(name, classification, item_id, self.player)
 
     def _create_event_item(self, name: str) -> Item:
-        # Event items typically have no numeric ID; they exist only in the current multiworld context.
         return Item(name, ItemClassification.progression, None, self.player)
 
     def fill_slot_data(self) -> Dict[str, Any]:

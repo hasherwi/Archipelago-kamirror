@@ -109,6 +109,19 @@ class KirbyAMWorld(World):
                 "Tag additional items/locations with 'poc' to fix."
             )
 
+        # Handle filler items
+        filler_candidates = [
+            row["name"]
+            for row in data.items
+            if "poc" in row.get("tags", []) and (row.get("classification") or "").strip().lower() == "filler"
+        ]
+        if len(filler_candidates) != 1:
+            raise ValueError(
+                "POC padding requires exactly one item tagged 'poc' with classification 'filler' in items.yaml. "
+                f"Found {len(filler_candidates)}: {filler_candidates}"
+            )
+        self._poc_padding_item_name = filler_candidates[0]
+
     def create_regions(self) -> None:
         menu = Region(self.origin_region_name, self.player, self.multiworld)
         self.multiworld.regions.append(menu)
@@ -158,7 +171,16 @@ class KirbyAMWorld(World):
             branch.locations.append(Location(self.player, loc_name, self.location_name_to_id[loc_name], branch))
 
     def create_items(self) -> None:
-        for item_name in self._poc_item_names:
+        # Start with the POC-tagged items
+        pool_names = list(self._poc_item_names)
+
+        # Pad to match POC locations if needed
+        needed = len(self._poc_location_names) - len(pool_names)
+        if needed > 0:
+            assert self._poc_padding_item_name is not None
+            pool_names.extend([self._poc_padding_item_name] * needed)
+
+        for item_name in pool_names:
             self.multiworld.itempool.append(self.create_item(item_name))
 
     def set_rules(self) -> None:

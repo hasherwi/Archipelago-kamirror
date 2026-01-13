@@ -20,3 +20,16 @@ class TestKirbyAMPOCItems(KirbyAMTestBase):
 
         missing = expected - pool
         assert not missing, f"POC items missing from itempool: {sorted(missing)}"
+        
+    def test_itempool_count_matches_poc_locations(self) -> None:
+        self.world_setup()
+
+        # Count non-event locations: exclude Victory which is an event location
+        poc_locations = [loc for loc in self.multiworld.get_locations(self.player) if loc.address is not None]
+        pool_items = [it for it in self.multiworld.itempool if it.player == self.player]
+
+        assert len(pool_items) == len(poc_locations), (
+            f"Expected itempool count to match non-event locations "
+            f"(items={len(pool_items)}, locations={len(poc_locations)})"
+        )
+

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from BaseClasses import Item, ItemClassification, Location, Region
-from worlds.AutoWorld import WebWorld, World
+from worlds.AutoWorld import WebWorld, World, Tutorial
 
 
 GAME_NAME = "Kirby & The Amazing Mirror"
@@ -12,6 +12,16 @@ GAME_NAME = "Kirby & The Amazing Mirror"
 class KirbyAMWebWorld(WebWorld):
     game = GAME_NAME
     game_info_languages = ["en"]
+    tutorials = [
+        Tutorial(
+            tutorial_name="Setup Guide",
+            description="How to set up and play Kirby & The Amazing Mirror in Archipelago (POC).",
+            language="English",
+            file_name="setup_en.md",
+            link="setup/en",
+            authors=["Harrison"]
+        )
+    ]
     bug_report_page = None
 
 

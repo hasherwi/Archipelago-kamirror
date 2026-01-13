@@ -3,9 +3,24 @@ goals:
 - key: defeat_dark_mind
   name: Defeat Dark Mind
   logic_notes: Collect All Mirror Shards
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
 - key: 100_percent
   name: 100% Completion
   logic_notes: Collect All Items and Defeat Dark Mind
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null
 - key: collect_all_mirror_shards
   name: Collect All Mirror Shards
   logic_notes: Collect All Mirror Shards
+  addresses:
+    na: null
+    eu: null
+    jp: null
+    vc: null

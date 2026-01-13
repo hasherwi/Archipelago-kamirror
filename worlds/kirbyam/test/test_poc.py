@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from .bases import KamirrorTestBase
+from .bases import KirbyAMTestBase
 
 
-class TestKamirrorPOCSmoke(KamirrorTestBase):
+class TestKirbyAMPOCSmoke(KirbyAMTestBase):
     def test_can_generate(self) -> None:
         # If world construction or generation fails, this test will fail automatically.
         self.world_setup()

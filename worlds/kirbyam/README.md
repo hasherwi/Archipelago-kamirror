@@ -35,7 +35,7 @@ client-side components needed to play Kirby & The Amazing Mirror in Archipelago.
 
 Typical structure (may evolve as implementation grows):
 
-- `worlds/kamirror/` – Archipelago world package (Python)
+- `worlds/kirbyam/` – Archipelago world package (Python)
   - `__init__.py` – World entrypoint
   - `items.py`, `locations.py`, `regions.py`, `rules.py`, `options.py` – modular world code
   - `docs/` – world docs rendered by WebHost

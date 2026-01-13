@@ -67,7 +67,7 @@ Refer to:
 
 All logic changes **should include tests**.
 
-- World logic tests live under: `worlds/kamirror/test`
+- World logic tests live under: `worlds/kirbyam/test`
 - Prefer tests based on `WorldTestBase`
 - Ensure:
 - All locations are reachable with full inventory

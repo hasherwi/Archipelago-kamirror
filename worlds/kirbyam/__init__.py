@@ -9,15 +9,15 @@ from worlds.AutoWorld import WebWorld, World
 GAME_NAME = "Kirby & The Amazing Mirror"
 
 
-class KamirrorWebWorld(WebWorld):
+class KirbyAMWebWorld(WebWorld):
     game = GAME_NAME
     game_info_languages = ["en"]
     bug_report_page = None
 
 
-class KamirrorWorld(World):
+class KirbyAMWorld(World):
     game = GAME_NAME
-    web = KamirrorWebWorld()
+    web = KirbyAMWebWorld()
 
     origin_region_name = "Menu"
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypedDict, NotRequired, Optional, Literal, List, Dict, Any, cast
+from typing import Any, Dict, List, Literal, NotRequired, Optional, TypedDict, cast
 
 try:
     import yaml  # type: ignore[import]
@@ -39,6 +39,8 @@ class ItemRow(TypedDict):
 class LocationRow(TypedDict, total=False):
     key: str
     name: str
+    # Optional semantic “value” for the location (e.g., room id trigger).
+    value: NotRequired[int]
     addresses: NotRequired[AddressMap]
     tags: NotRequired[list[str]]
 
@@ -136,6 +138,16 @@ def _validate_addresses(entry: Dict[str, Any], path: Path, idx: int, list_name: 
             raise TypeError(f"{path}: '{list_name}[{idx}].addresses.{locale}' must be int or null")
 
 
+def _validate_optional_int_field(entry: Dict[str, Any], field: str, path: Path, idx: int, list_name: str) -> None:
+    if field not in entry:
+        return
+    v = entry.get(field)
+    if v is None:
+        return
+    if not isinstance(v, int):
+        raise TypeError(f"{path}: '{list_name}[{idx}].{field}' must be an int if present")
+
+
 def load_kirbyam_data() -> KirbyAMData:
     """
     Load canonical YAML datasets for Kirby & The Amazing Mirror.
@@ -183,6 +195,7 @@ def load_kirbyam_data() -> KirbyAMData:
 
     for idx, entry in enumerate(locations):
         _require_non_empty_str(entry, "name", locations_path, idx, "locations")
+        _validate_optional_int_field(entry, "value", locations_path, idx, "locations")
         _validate_addresses(entry, locations_path, idx, "locations")
 
     for idx, entry in enumerate(goals):
@@ -193,5 +206,5 @@ def load_kirbyam_data() -> KirbyAMData:
         schema_version=items_schema,
         items=cast(List[ItemRow], items),
         locations=cast(List[LocationRow], locations),
-        goals=cast(List[GoalRow], goals)
+        goals=cast(List[GoalRow], goals),
     )

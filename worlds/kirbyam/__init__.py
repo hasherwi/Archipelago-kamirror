@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional, List, Mapping
 
 from BaseClasses import Item, ItemClassification, Location, Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
@@ -10,7 +10,6 @@ from .id_map import build_id_map
 from .logging_utils import log_event, log_debug
 
 GAME_NAME = "Kirby & The Amazing Mirror"
-
 ORIGIN_REGION = "Menu"
 
 
@@ -24,44 +23,55 @@ class KirbyAMWebWorld(WebWorld):
             language="English",
             file_name="setup_en.md",
             link="setup/en",
-            authors=["Harrison"]
+            authors=["Harrison"],
         )
     ]
     bug_report_page = None
 
 
 class KirbyAMWorld(World):
+    """
+    Minimal POC world:
+
+    - Regions: Menu -> Main Area -> Test Branch
+    - Locations: all YAML locations tagged 'poc' become real AP locations (address != None)
+    - Victory: separate *event* location (address None) containing *event* item (code None)
+    - Items: all YAML items tagged 'poc' are in the pool; pad with exactly one configured filler item as needed
+    """
+
+    # ----- Required by AutoWorld metaclass -----
+    item_name_to_id: Dict[str, int] = {}
+    location_name_to_id: Dict[str, int] = {}
+
+    game = GAME_NAME
+    web = KirbyAMWebWorld()
+    origin_region_name = ORIGIN_REGION
+
+    # Deterministic base IDs. Do not change once you have public releases.
+    _base_location_id = 23_450_000
+    _base_item_id = 23_460_000
+
+    # ----- Instance state -----
     _data: KirbyAMData
     _poc_location_names: List[str]
     _poc_item_names: List[str]
     _poc_padding_item_name: Optional[str]
-    
-    game = GAME_NAME
-    web = KirbyAMWebWorld()
+    _goal_location_name: Optional[str]
 
-    origin_region_name = ORIGIN_REGION
-    
-    # Deterministic base IDs. Do not change once you have public releases.
-    _base_location_id = 23_450_000
-    _base_item_id = 23_460_000
-    
-    # Required by AutoWorld metaclass. Do not mutate these dicts in-place.
-    # These are populated from YAML in generate_early()
-    item_name_to_id: Dict[str, int] = {}
-    location_name_to_id: Dict[str, int] = {}
+    # Event naming (tests rely on these names)
+    _VICTORY_LOCATION_NAME = "Victory"
+    _VICTORY_ITEM_NAME = "Victory"
 
-    
     def _log_ctx(self) -> dict[str, object]:
-        # Keep this conservative: only fields that exist this early.
-        # multiworld.seed_name may not exist yet, so use getattr.
+        mw = getattr(self, "multiworld", None)
         return {
             "player": getattr(self, "player", None),
-            "player_name": getattr(self.multiworld, "player_name", {}).get(self.player) if getattr(self, "multiworld", None) else None,
-            "seed": getattr(self.multiworld, "seed_name", None) if getattr(self, "multiworld", None) else None,
+            "player_name": getattr(mw, "player_name", {}).get(self.player) if mw else None,
+            "seed": getattr(mw, "seed_name", None) if mw else None,
             "game": getattr(self, "game", None),
             "world_id": id(self),
         }
-    
+
     @staticmethod
     def _class_from_str(value: str | None) -> ItemClassification:
         if not value:
@@ -73,15 +83,21 @@ class KirbyAMWorld(World):
             return ItemClassification.useful
         if v == "trap":
             return ItemClassification.trap
-        # default
         return ItemClassification.filler
+
+    @staticmethod
+    def _tags(row: Mapping[str, object]) -> List[str]:
+        tags = row.get("tags", [])
+        if isinstance(tags, list):
+            return [str(t) for t in tags]
+        return []
 
     def generate_early(self) -> None:
         log_event("generate_early.start", **self._log_ctx())
 
         self._data = load_kirbyam_data()
         data = self._data
-        
+
         # ensure instance-local dicts
         self.item_name_to_id = dict(self.item_name_to_id)
         self.location_name_to_id = dict(self.location_name_to_id)
@@ -94,25 +110,41 @@ class KirbyAMWorld(World):
             goals=len(data.goals),
         )
 
-        # Build key->id maps FIRST
+        # Build deterministic key->id maps
         item_key_to_id = build_id_map(
             (row["key"] for row in data.items if "key" in row),
-            base_id=23_460_000,
+            base_id=self._base_item_id,
             namespace="kirbyam:item",
         )
         loc_key_to_id = build_id_map(
             (row["key"] for row in data.locations if "key" in row),
-            base_id=23_450_000,
+            base_id=self._base_location_id,
             namespace="kirbyam:location",
         )
 
-        # Then build name->id maps from those
-        self.item_name_to_id = {row["name"]: item_key_to_id[row["key"]] for row in data.items if "key" in row and "name" in row}
-        self.location_name_to_id = {row["name"]: loc_key_to_id[row["key"]] for row in data.locations if "key" in row and "name" in row}
+        # Build name->id maps
+        self.item_name_to_id = {
+            str(row["name"]): item_key_to_id[str(row["key"])]
+            for row in data.items
+            if "key" in row and "name" in row
+        }
+        self.location_name_to_id = {
+            str(row["name"]): loc_key_to_id[str(row["key"])]
+            for row in data.locations
+            if "key" in row and "name" in row
+        }
 
-        # Then compute POC lists
-        self._poc_location_names = [row["name"] for row in data.locations if "poc" in row.get("tags", []) and "name" in row]
-        self._poc_item_names = [row["name"] for row in data.items if "poc" in row.get("tags", []) and "name" in row]
+        # POC selection by tags (no hard-coded keys)
+        self._poc_location_names = [
+            str(row["name"])
+            for row in data.locations
+            if "name" in row and "poc" in self._tags(row)
+        ]
+        self._poc_item_names = [
+            str(row["name"])
+            for row in data.items
+            if "name" in row and "poc" in self._tags(row)
+        ]
 
         log_event(
             "generate_early.poc_sets",
@@ -126,29 +158,28 @@ class KirbyAMWorld(World):
         if not self._poc_item_names:
             raise ValueError("No items tagged 'poc' found in items.yaml")
 
-        # Validate that POC names exist in the maps we just built
+        # Validate names exist in the ID maps
         missing_loc_ids = [n for n in self._poc_location_names if n not in self.location_name_to_id]
         missing_item_ids = [n for n in self._poc_item_names if n not in self.item_name_to_id]
         if missing_loc_ids:
             raise ValueError(f"POC locations missing from location_name_to_id: {missing_loc_ids}")
         if missing_item_ids:
             raise ValueError(f"POC items missing from item_name_to_id: {missing_item_ids}")
-        
-        poc_loc_count = len(self._poc_location_names)
-        poc_item_count = len(self._poc_item_names)
 
-        if poc_item_count != poc_loc_count:
-            raise ValueError(
-                "POC requires item count == location count. "
-                f"poc_items={poc_item_count} poc_locations={poc_loc_count}. "
-                "Tag additional items/locations with 'poc' to fix."
-            )
+        # Identify the "goal" location (optional but recommended)
+        goal_locs = [
+            str(row["name"])
+            for row in data.locations
+            if "name" in row and "poc" in self._tags(row) and "goal" in self._tags(row)
+        ]
+        self._goal_location_name = goal_locs[0] if goal_locs else None
 
-        # Handle filler items
+        # Choose exactly one padding item: tagged 'poc' and classification == filler
         filler_candidates = [
-            row["name"]
+            str(row["name"])
             for row in data.items
-            if "poc" in row.get("tags", []) and (row.get("classification") or "").strip().lower() == "filler"
+            if "name" in row and "poc" in self._tags(row)
+            and (str(row.get("classification", "")).strip().lower() == "filler")
         ]
         if len(filler_candidates) != 1:
             raise ValueError(
@@ -156,60 +187,46 @@ class KirbyAMWorld(World):
                 f"Found {len(filler_candidates)}: {filler_candidates}"
             )
         self._poc_padding_item_name = filler_candidates[0]
-        
+
         log_event(
-            "generate_early.poc_padding_policy",
+            "generate_early.poc_contract",
             **self._log_ctx(),
+            goal_location=self._goal_location_name,
             padding_item=self._poc_padding_item_name,
         )
-        
-        log_event("generate_early.done", **self._log_ctx())
 
+        log_event("generate_early.done", **self._log_ctx())
 
     def create_regions(self) -> None:
         log_event("create_regions.start", **self._log_ctx())
-        
+
+        # Regions required by tests
         menu = Region(self.origin_region_name, self.player, self.multiworld)
-        self.multiworld.regions.append(menu)
-
-        victory_event = Location(self.player, "Victory", None, menu)
-        victory_event.place_locked_item(self._create_event_item("Victory"))
-        menu.locations.append(victory_event)
-
         main = Region("Main Area", self.player, self.multiworld)
         branch = Region("Test Branch", self.player, self.multiworld)
-        
-        self.multiworld.regions.append(main)
-        self.multiworld.regions.append(branch)
 
+        self.multiworld.regions += [menu, main, branch]
+
+        # Connect such that branch is reachable with no items
         menu.connect(main, "To Main Area")
         main.connect(branch, "To Test Branch")
-        
-        # POC locations in Main Area.
-        #
-        # These are intentionally minimal and exist to validate:
-        # - name->id mapping from YAML
-        # - region/location registration
-        # - basic seed generation
-        #
-        # Once Phase 2 starts, this section will be replaced by data-driven region
-        # construction and real location placement.
 
-        data = self._data
-        poc_locations = self._poc_location_names
+        # Victory *event* location in Menu (address None)
+        victory_loc = Location(self.player, self._VICTORY_LOCATION_NAME, None, menu)
+        victory_loc.place_locked_item(self._create_event_item(self._VICTORY_ITEM_NAME))
+        menu.locations.append(victory_loc)
 
-        missing = [n for n in poc_locations if n not in self.location_name_to_id]
-        if missing:
-            raise ValueError(f"POC locations missing from locations.yaml: {missing}")
-        
-        if not poc_locations:
-            raise ValueError("No locations tagged 'poc' found in locations.yaml")
-
-        # Example: first N go in Main Area, remainder in Test Branch
+        # Place POC locations across regions (none locked; these must be fillable)
+        poc_locations = list(self._poc_location_names)
         split = max(1, len(poc_locations) // 2)
         main_locs = poc_locations[:split]
         branch_locs = poc_locations[split:]
-        
+
+        for loc_name in main_locs:
+            main.locations.append(Location(self.player, loc_name, self.location_name_to_id[loc_name], main))
+        for loc_name in branch_locs:
+            branch.locations.append(Location(self.player, loc_name, self.location_name_to_id[loc_name], branch))
+
         log_debug(
             "create_regions.poc_distribution",
             **self._log_ctx(),
@@ -217,61 +234,61 @@ class KirbyAMWorld(World):
             branch_count=len(branch_locs),
         )
 
-        for loc_name in main_locs:
-            main.locations.append(Location(self.player, loc_name, self.location_name_to_id[loc_name], main))
-
-        for loc_name in branch_locs:
-            branch.locations.append(Location(self.player, loc_name, self.location_name_to_id[loc_name], branch))
-            
         log_event(
             "create_regions.done",
             **self._log_ctx(),
-            regions=3,  # update if you compute dynamically
-            poc_locations=len(self._poc_location_names),
+            regions=3,
+            poc_locations=len(poc_locations),
         )
-
 
     def create_items(self) -> None:
         log_event("create_items.start", **self._log_ctx())
-        
-        # Start with the POC-tagged items
+
+        # Build pool from all POC items
         pool_names = list(self._poc_item_names)
 
-        # Pad to match POC locations if needed
-        needed = len(self._poc_location_names) - len(pool_names)
+        # Pad to match *fillable* location count (exclude Victory event)
+        fillable_locations = len(self._poc_location_names)
+        needed = fillable_locations - len(pool_names)
+
         if needed > 0:
             assert self._poc_padding_item_name is not None
             pool_names.extend([self._poc_padding_item_name] * needed)
+        elif needed < 0:
+            raise ValueError(
+                "POC requires items <= locations (Victory is an event and not fillable). "
+                f"poc_items={len(self._poc_item_names)} poc_locations={fillable_locations}"
+            )
 
         for item_name in pool_names:
             self.multiworld.itempool.append(self.create_item(item_name))
-            
-        # If you build pool_names list, log counts
+
         log_event(
             "create_items.done",
             **self._log_ctx(),
             pool_items=len(pool_names),
-            padded= max(0, len(pool_names) - len(self._poc_item_names)),
+            padded=max(0, len(pool_names) - len(self._poc_item_names)),
         )
-
 
     def set_rules(self) -> None:
         log_event("set_rules.start", **self._log_ctx())
-        self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
-        log_event("set_rules.done", **self._log_ctx(), completion="Victory")
+
+        # Completion is based on collecting the Victory event item
+        self.multiworld.completion_condition[self.player] = (
+            lambda state: state.has(self._VICTORY_ITEM_NAME, self.player)
+        )
+
+        log_event("set_rules.done", **self._log_ctx(), completion=self._VICTORY_ITEM_NAME)
 
     def create_item(self, name: str) -> Item:
         item_id = self.item_name_to_id[name]
-
-        # Look up classification from YAML (default filler)
-        row = next((r for r in self._data.items if r["name"] == name), None)
-        classification = self._class_from_str(row.get("classification") if row else None)
-
+        row = next((r for r in self._data.items if str(r.get("name")) == name), None)
+        classification = self._class_from_str(str(row.get("classification")) if row else None)
         return Item(name, classification, item_id, self.player)
 
     def _create_event_item(self, name: str) -> Item:
+        # code=None is correct for event items; must only be placed at address=None locations
         return Item(name, ItemClassification.progression, None, self.player)
 
     def fill_slot_data(self) -> Dict[str, Any]:
-        # Keep minimal until the BizHawk client is implemented.
         return {}

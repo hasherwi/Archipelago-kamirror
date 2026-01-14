@@ -1,31 +1,88 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Dict, Optional, Set, Tuple
 
-from NetUtils import ClientStatus
 from worlds._bizhawk.client import BizHawkClient
 from worlds._bizhawk.context import BizHawkClientContext
-from worlds._bizhawk import memory
 
 from .ram import KirbyAMRamSpec, load_ram_spec
 
 GAME_NAME = "Kirby & The Amazing Mirror"
 
+logger = logging.getLogger(__name__)
+
+# slot_data["poc"] keys (adjust here if your slot_data structure differs)
+POC_ROOT_KEY = "poc"
+POC_LOCATIONS_KEY = "locations"
+POC_ITEMS_KEY = "items"
+
+POC_ROOM_CHECK_KEY = "room_check"
+POC_GOAL_KEY = "goal"
+
+POC_ITEM_MAX_HEALTH_KEY = "max_health_up"
+POC_ITEM_PHONE_CHARGE_KEY = "phone_charge"
+
+
+@dataclass(frozen=True)
+class _LocationTrigger:
+    loc_id: int
+    room_value_na: int
+
 
 @dataclass(frozen=True)
 class _POCConfig:
-    # These names must match your YAML names used by the world.
-    room_check_location_name: str
-    victory_location_name: str
+    room_check: _LocationTrigger
+    goal: _LocationTrigger
 
-    # Room ids for triggers (from ram.yaml)
-    room_check_room_id: int
-    goal_room_id: int
+    max_health_item_id: int
+    phone_charge_item_id: int
 
-    # Item names must match your items.yaml
-    max_health_item_name: str
-    phone_charge_item_name: str
+
+def _expect_int(value: Any, path: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"Expected int at {path}, got {type(value).__name__}: {value!r}")
+    return value
+
+
+def _get_poc_slot(ctx: BizHawkClientContext) -> Dict[str, Any]:
+    if not isinstance(getattr(ctx, "slot_data", None), dict):
+        raise ValueError("ctx.slot_data is not available or not a dict yet")
+    root = ctx.slot_data.get(POC_ROOT_KEY)
+    if not isinstance(root, dict):
+        raise ValueError(f"slot_data[{POC_ROOT_KEY!r}] is missing or not a dict")
+    return root
+
+
+def _parse_trigger(poc: Dict[str, Any], trigger_key: str) -> _LocationTrigger:
+    locs = poc.get(POC_LOCATIONS_KEY)
+    if not isinstance(locs, dict):
+        raise ValueError(f"slot_data['{POC_ROOT_KEY}']['{POC_LOCATIONS_KEY}'] missing or not a dict")
+
+    raw = locs.get(trigger_key)
+    if not isinstance(raw, dict):
+        raise ValueError(
+            f"slot_data['{POC_ROOT_KEY}']['{POC_LOCATIONS_KEY}']['{trigger_key}'] missing or not a dict"
+        )
+
+    loc_id = _expect_int(raw.get("id"), f"{POC_ROOT_KEY}.{POC_LOCATIONS_KEY}.{trigger_key}.id")
+    room_value = _expect_int(
+        raw.get("room_value_na"), f"{POC_ROOT_KEY}.{POC_LOCATIONS_KEY}.{trigger_key}.room_value_na"
+    )
+    return _LocationTrigger(loc_id=loc_id, room_value_na=room_value)
+
+
+def _parse_item_id(poc: Dict[str, Any], item_key: str) -> int:
+    items = poc.get(POC_ITEMS_KEY)
+    if not isinstance(items, dict):
+        raise ValueError(f"slot_data['{POC_ROOT_KEY}']['{POC_ITEMS_KEY}'] missing or not a dict")
+
+    raw = items.get(item_key)
+    if not isinstance(raw, dict):
+        raise ValueError(f"slot_data['{POC_ROOT_KEY}']['{POC_ITEMS_KEY}']['{item_key}'] missing or not a dict")
+
+    return _expect_int(raw.get("id"), f"{POC_ROOT_KEY}.{POC_ITEMS_KEY}.{item_key}.id")
 
 
 class KirbyAMBizHawkClient(BizHawkClient):
@@ -36,170 +93,173 @@ class KirbyAMBizHawkClient(BizHawkClient):
         self._ram: Optional[KirbyAMRamSpec] = None
         self._poc: Optional[_POCConfig] = None
 
-        # Local state to avoid spamming checks
-        self._last_room_id: Optional[int] = None
-        self._sent_goal: bool = False
+        # POC runtime state
+        self._checked_locations: Set[int] = set()
+        self._last_room_value: Optional[int] = None
+
+        # Item application cursor
+        self._items_applied: int = 0
 
     async def validate_rom(self, ctx: BizHawkClientContext) -> bool:
-        """
-        Optional but recommended. If you add a ROM hash/signature to ram.yaml,
-        validate it here to prevent users from connecting the wrong game.
-        """
+        # Optional: if you later add ROM signature validation in ram.yaml, implement it here.
         return True
 
-    async def game_watcher(self, ctx: BizHawkClientContext) -> None:
-        if ctx.slot_data is None or ctx.slot is None:
-            return
-
-        # Load ram.yaml once
+    def _ensure_ram_loaded(self) -> KirbyAMRamSpec:
         if self._ram is None:
             self._ram = load_ram_spec()
+            logger.info("Loaded ram spec")
+        return self._ram
 
-        # Build POC config once using slot_data + your YAML naming conventions.
-        # Keep this stable and boring; avoid hard-coding IDs if slot_data can provide them.
-        if self._poc is None:
-            # You can also choose to embed these in slot_data from fill_slot_data().
-            self._poc = _POCConfig(
-                room_check_location_name=ctx.slot_data.get("poc_room_check_location", "POC: Enter Room (Check)"),
-                victory_location_name=ctx.slot_data.get("poc_victory_location", "Victory"),
-                room_check_room_id=int(ctx.slot_data.get("poc_room_check_room_id", 0)),
-                goal_room_id=int(ctx.slot_data.get("poc_goal_room_id", 0)),
-                max_health_item_name=ctx.slot_data.get("poc_max_health_item", "Max Health Up"),
-                phone_charge_item_name=ctx.slot_data.get("poc_phone_charge_item", "Charge Cell Phone"),
-            )
+    def _ensure_poc_loaded(self, ctx: BizHawkClientContext) -> _POCConfig:
+        if self._poc is not None:
+            return self._poc
 
-        ram = self._ram
-        poc = self._poc
+        poc = _get_poc_slot(ctx)
 
-        # Resolve name->id via server slot_data mappings (best practice).
-        # Your world can include these mappings in fill_slot_data() to avoid re-deriving them here.
-        name_to_loc_id: dict[str, int] = ctx.slot_data.get("location_name_to_id", {})
-        name_to_item_id: dict[str, int] = ctx.slot_data.get("item_name_to_id", {})
+        room_check = _parse_trigger(poc, POC_ROOM_CHECK_KEY)
+        goal = _parse_trigger(poc, POC_GOAL_KEY)
 
-        room_check_loc_id = name_to_loc_id.get(poc.room_check_location_name)
-        victory_loc_id = name_to_loc_id.get(poc.victory_location_name)
+        max_health_item_id = _parse_item_id(poc, POC_ITEM_MAX_HEALTH_KEY)
+        phone_charge_item_id = _parse_item_id(poc, POC_ITEM_PHONE_CHARGE_KEY)
 
-        # --- Read current room id ---
-        # Use guards so you never read garbage if the ROM state isn't “in-game”.
-        room_id_bytes = await self.read(
-            ctx,
-            [(ram.room_id.domain, ram.room_id.address, ram.room_id.size)],
-            ram.guards,
+        self._poc = _POCConfig(
+            room_check=room_check,
+            goal=goal,
+            max_health_item_id=max_health_item_id,
+            phone_charge_item_id=phone_charge_item_id,
         )
-        if not room_id_bytes:
+
+        logger.info(
+            "Loaded POC slot_data: room_check(loc_id=%s room_value_na=%s) goal(loc_id=%s room_value_na=%s) "
+            "items(max_health=%s phone_charge=%s)",
+            room_check.loc_id,
+            room_check.room_value_na,
+            goal.loc_id,
+            goal.room_value_na,
+            max_health_item_id,
+            phone_charge_item_id,
+        )
+        return self._poc
+
+    def _read_room_value_na(self, ctx: BizHawkClientContext, ram: KirbyAMRamSpec) -> int:
+        """
+        Reads the current room value from RAM.
+
+        This assumes your BizHawkClientContext provides read_u8 / read_u16_le.
+        If your environment instead requires ctx.bizhawk_ctx.read(...) or similar,
+        change this function only; the rest of the client remains stable.
+        """
+        region = ram.na
+
+        if region.room_id_width == 1:
+            return int(ctx.read_u8(region.room_id_addr))
+
+        # default: u16 little-endian
+        return int(ctx.read_u16_le(region.room_id_addr))
+
+    async def _send_location_check(self, ctx: BizHawkClientContext, loc_id: int) -> None:
+        if loc_id in self._checked_locations:
+            return
+        self._checked_locations.add(loc_id)
+
+        await ctx.send_msgs(
+            [
+                {
+                    "cmd": "LocationChecks",
+                    "locations": [loc_id],
+                }
+            ]
+        )
+
+    async def _apply_received_items(self, ctx: BizHawkClientContext, poc: _POCConfig, ram: KirbyAMRamSpec) -> None:
+        items_received = getattr(ctx, "items_received", None)
+        if not isinstance(items_received, list) or not items_received:
             return
 
-        room_id = memory.unpack_uint16(room_id_bytes[0]) if ram.room_id.size == 2 else memory.unpack_uint8(room_id_bytes[0])
-
-        # --- Location check on entering a specific room ---
-        if (
-            room_check_loc_id is not None
-            and room_id != self._last_room_id
-            and room_id == poc.room_check_room_id
-        ):
-            await ctx.check_locations({room_check_loc_id})
-
-        # --- Goal when entering goal room ---
-        if not self._sent_goal and room_id == poc.goal_room_id:
-            self._sent_goal = True
-
-            # Option A: Mark a dedicated Victory location checked (recommended if your world uses an event item).
-            if victory_loc_id is not None:
-                await ctx.check_locations({victory_loc_id})
-
-            # Option B: Also send status update (harmless even if you use Victory event logic).
-            await ctx.send_msgs([{
-                "cmd": "StatusUpdate",
-                "status": ClientStatus.CLIENT_GOAL,
-            }])
-            ctx.finished_game = True
-
-        self._last_room_id = room_id
-
-        # --- Apply received items ---
-        # “BizHawkClient” provides item reception tracking via ctx.items_received.
-        # Keep it minimal: apply the delta since last loop.
-        await self._apply_received_items(ctx, ram, poc, name_to_item_id)
-
-    async def _apply_received_items(
-        self,
-        ctx: BizHawkClientContext,
-        ram: KirbyAMRamSpec,
-        poc: _POCConfig,
-        name_to_item_id: dict[str, int],
-    ) -> None:
-        if ctx.items_received is None:
+        if self._items_applied >= len(items_received):
             return
 
-        # Track how many we’ve applied already.
-        applied = getattr(ctx, "_kirbyam_items_applied", 0)
-        if applied >= len(ctx.items_received):
-            return
-
-        new_items = ctx.items_received[applied:]
-        setattr(ctx, "_kirbyam_items_applied", len(ctx.items_received))
+        new_items = items_received[self._items_applied :]
+        self._items_applied = len(items_received)
 
         for net_item in new_items:
-            # net_item.item is the numeric item id.
-            # We map by name for readability via slot_data map inversion.
-            # If you prefer, store an id->action map in slot_data.
-            item_name = None
-            # Invert mapping lazily (small POC scale; fine).
-            for n, iid in name_to_item_id.items():
-                if iid == net_item.item:
-                    item_name = n
-                    break
+            item_id = getattr(net_item, "item", None)
+            if not isinstance(item_id, int):
+                continue
 
-            if item_name == poc.max_health_item_name:
+            if item_id == poc.max_health_item_id:
                 await self._give_max_health(ctx, ram)
-            elif item_name == poc.phone_charge_item_name:
+            elif item_id == poc.phone_charge_item_id:
                 await self._give_phone_charge(ctx, ram)
             else:
-                # Unknown or filler you haven't implemented: ignore safely.
+                # Unknown / unimplemented item: ignore safely.
                 pass
 
     async def _give_max_health(self, ctx: BizHawkClientContext, ram: KirbyAMRamSpec) -> None:
         """
-        Example: increment max HP by 1 (or whatever your ram.yaml defines).
+        Minimal implementation: increment max HP by 1 up to max_value.
+        Assumes ctx has async read/write helpers on BizHawkClient, or that your
+        BizHawkClientContext exposes equivalent APIs.
+
+        If your current stack doesn't support these exact read/write calls yet,
+        keep this as a no-op until your memory bridge is finalized.
         """
-        cur_bytes = await self.read(
-            ctx,
-            [(ram.max_hp.domain, ram.max_hp.address, ram.max_hp.size)],
-            ram.guards,
-        )
-        if not cur_bytes:
+        spec = ram.max_hp
+        if spec is None:
             return
 
-        cur = memory.unpack_uint8(cur_bytes[0]) if ram.max_hp.size == 1 else memory.unpack_uint16(cur_bytes[0])
-        new = min(cur + 1, ram.max_hp.max_value)
+        # If your BizHawk layer is different, change these two calls only.
+        cur = await ctx.read_int(spec.domain, spec.address, spec.size, signed=False, little_endian=True)
+        new = min(cur + 1, spec.max_value)
+        await ctx.write_int(spec.domain, spec.address, new, spec.size, signed=False, little_endian=True)
 
-        await self.write(
-            ctx,
-            [(ram.max_hp.domain, ram.max_hp.address, memory.pack_uint8(new) if ram.max_hp.size == 1 else memory.pack_uint16(new))],
-            ram.guards,
-        )
+        logger.info("Applied Max Health Up: %s -> %s", cur, new)
 
     async def _give_phone_charge(self, ctx: BizHawkClientContext, ram: KirbyAMRamSpec) -> None:
         """
-        Optional: increment a “phone charge” counter.
-        If you don't have a real RAM concept yet, you can no-op safely.
+        Optional: increment a phone charge counter, if present in ram.yaml.
         """
-        if ram.phone_charge is None:
+        spec = ram.phone_charge
+        if spec is None:
             return
 
-        cur_bytes = await self.read(
-            ctx,
-            [(ram.phone_charge.domain, ram.phone_charge.address, ram.phone_charge.size)],
-            ram.guards,
-        )
-        if not cur_bytes:
+        cur = await ctx.read_int(spec.domain, spec.address, spec.size, signed=False, little_endian=True)
+        new = min(cur + 1, spec.max_value)
+        await ctx.write_int(spec.domain, spec.address, new, spec.size, signed=False, little_endian=True)
+
+        logger.info("Applied Phone Charge: %s -> %s", cur, new)
+
+    async def game_watcher(self, ctx: BizHawkClientContext) -> None:
+        """
+        Called every client tick.
+
+        Responsibilities:
+        - Load ram.yaml + slot_data POC config once available
+        - Read current room value
+        - Fire LocationChecks when room matches triggers
+        - Apply received items
+        """
+        # Slot data is not always available immediately after connect.
+        if not isinstance(getattr(ctx, "slot_data", None), dict):
             return
 
-        cur = memory.unpack_uint8(cur_bytes[0])
-        new = min(cur + 1, ram.phone_charge.max_value)
+        ram = self._ensure_ram_loaded()
+        poc = self._ensure_poc_loaded(ctx)
 
-        await self.write(
-            ctx,
-            [(ram.phone_charge.domain, ram.phone_charge.address, memory.pack_uint8(new))],
-            ram.guards,
-        )
+        room_value = self._read_room_value_na(ctx, ram)
+
+        # Reduce log spam: only log on room change
+        if room_value != self._last_room_value:
+            logger.debug("Room changed: %s -> %s", self._last_room_value, room_value)
+            self._last_room_value = room_value
+
+        # Trigger: room check
+        if room_value == poc.room_check.room_value_na:
+            await self._send_location_check(ctx, poc.room_check.loc_id)
+
+        # Trigger: goal
+        if room_value == poc.goal.room_value_na:
+            await self._send_location_check(ctx, poc.goal.loc_id)
+
+        # Apply item effects after location triggers
+        await self._apply_received_items(ctx, poc, ram)

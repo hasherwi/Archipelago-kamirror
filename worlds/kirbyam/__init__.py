@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional, List
 
 from BaseClasses import Item, ItemClassification, Location, Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
-from worlds.celeste_open_world import data
 
 from .data_loader import load_kirbyam_data, KirbyAMData
 from .id_map import build_id_map
@@ -35,6 +34,7 @@ class KirbyAMWorld(World):
     _data: KirbyAMData
     _poc_location_names: List[str]
     _poc_item_names: List[str]
+    _poc_padding_item_name: Optional[str]
     
     game = GAME_NAME
     web = KirbyAMWebWorld()
@@ -44,20 +44,22 @@ class KirbyAMWorld(World):
     # Deterministic base IDs. Do not change once you have public releases.
     _base_location_id = 23_450_000
     _base_item_id = 23_460_000
-
+    
+    # Required by AutoWorld metaclass. Do not mutate these dicts in-place.
     # These are populated from YAML in generate_early()
     item_name_to_id: Dict[str, int] = {}
     location_name_to_id: Dict[str, int] = {}
+
     
-    def _log_ctx(world: "KirbyAMWorld") -> dict[str, object]:
+    def _log_ctx(self) -> dict[str, object]:
         # Keep this conservative: only fields that exist this early.
         # multiworld.seed_name may not exist yet, so use getattr.
         return {
-            "player": getattr(world, "player", None),
-            "player_name": getattr(world.multiworld, "player_name", {}).get(world.player) if getattr(world, "multiworld", None) else None,
-            "seed": getattr(world.multiworld, "seed_name", None) if getattr(world, "multiworld", None) else None,
-            "game": getattr(world, "game", None),
-            "world_id": id(world),
+            "player": getattr(self, "player", None),
+            "player_name": getattr(self.multiworld, "player_name", {}).get(self.player) if getattr(self, "multiworld", None) else None,
+            "seed": getattr(self.multiworld, "seed_name", None) if getattr(self, "multiworld", None) else None,
+            "game": getattr(self, "game", None),
+            "world_id": id(self),
         }
     
     @staticmethod
@@ -75,14 +77,18 @@ class KirbyAMWorld(World):
         return ItemClassification.filler
 
     def generate_early(self) -> None:
-        log_event("generate_early.start", **_log_ctx(self))
+        log_event("generate_early.start", **self._log_ctx())
 
         self._data = load_kirbyam_data()
         data = self._data
+        
+        # ensure instance-local dicts
+        self.item_name_to_id = dict(self.item_name_to_id)
+        self.location_name_to_id = dict(self.location_name_to_id)
 
         log_event(
             "generate_early.data_loaded",
-            **_log_ctx(self),
+            **self._log_ctx(),
             items=len(data.items),
             locations=len(data.locations),
             goals=len(data.goals),
@@ -110,7 +116,7 @@ class KirbyAMWorld(World):
 
         log_event(
             "generate_early.poc_sets",
-            **_log_ctx(self),
+            **self._log_ctx(),
             poc_items=len(self._poc_item_names),
             poc_locations=len(self._poc_location_names),
         )
@@ -153,15 +159,15 @@ class KirbyAMWorld(World):
         
         log_event(
             "generate_early.poc_padding_policy",
-            **_log_ctx(self),
+            **self._log_ctx(),
             padding_item=self._poc_padding_item_name,
         )
         
-        log_event("generate_early.done", **_log_ctx(self))
+        log_event("generate_early.done", **self._log_ctx())
 
 
     def create_regions(self) -> None:
-        log_event("create_regions.start", **_log_ctx(self))
+        log_event("create_regions.start", **self._log_ctx())
         
         menu = Region(self.origin_region_name, self.player, self.multiworld)
         self.multiworld.regions.append(menu)
@@ -206,7 +212,7 @@ class KirbyAMWorld(World):
         
         log_debug(
             "create_regions.poc_distribution",
-            **_log_ctx(self),
+            **self._log_ctx(),
             main_count=len(main_locs),
             branch_count=len(branch_locs),
         )
@@ -219,14 +225,14 @@ class KirbyAMWorld(World):
             
         log_event(
             "create_regions.done",
-            **_log_ctx(self),
+            **self._log_ctx(),
             regions=3,  # update if you compute dynamically
             poc_locations=len(self._poc_location_names),
         )
 
 
     def create_items(self) -> None:
-        log_event("create_items.start", **_log_ctx(self))
+        log_event("create_items.start", **self._log_ctx())
         
         # Start with the POC-tagged items
         pool_names = list(self._poc_item_names)
@@ -243,16 +249,16 @@ class KirbyAMWorld(World):
         # If you build pool_names list, log counts
         log_event(
             "create_items.done",
-            **_log_ctx(self),
+            **self._log_ctx(),
             pool_items=len(pool_names),
             padded= max(0, len(pool_names) - len(self._poc_item_names)),
         )
 
 
     def set_rules(self) -> None:
-        log_event("set_rules.start", **_log_ctx(self))
+        log_event("set_rules.start", **self._log_ctx())
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
-        log_event("set_rules.done", **_log_ctx(self), completion="Victory")
+        log_event("set_rules.done", **self._log_ctx(), completion="Victory")
 
     def create_item(self, name: str) -> Item:
         item_id = self.item_name_to_id[name]

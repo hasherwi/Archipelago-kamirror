@@ -1,0 +1,85 @@
+{
+  "REGION_GAME_START": {
+    "locations": [],
+    "events": [],
+    "exits": [
+      "REGION_MUSTARD_MOUNTAIN/MAIN",
+      "REGION_MOONLIGHT_MANSION/MAIN",
+      "REGION_CANDY_CONSTELLATION/MAIN",
+      "REGION_OLIVE_OCEAN/MAIN",
+      "REGION_PEPPERMINT_PALACE/MAIN",
+      "REGION_CABBAGE_CAVERN/MAIN",
+      "REGION_CARROT_CASTLE/MAIN",
+      "REGION_RADISH_RUINS/MAIN",
+      "REGION_DIMENSION_MIRROR/MAIN"
+    ],
+    "warps": []
+  },
+
+  "REGION_MUSTARD_MOUNTAIN/MAIN": {
+    "locations": ["SHARD_1"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_MOONLIGHT_MANSION/MAIN": {
+    "locations": ["SHARD_2"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_CANDY_CONSTELLATION/MAIN": {
+    "locations": ["SHARD_3"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_OLIVE_OCEAN/MAIN": {
+    "locations": ["SHARD_4"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_PEPPERMINT_PALACE/MAIN": {
+    "locations": ["SHARD_5"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_CABBAGE_CAVERN/MAIN": {
+    "locations": ["SHARD_6"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_CARROT_CASTLE/MAIN": {
+    "locations": ["SHARD_7"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_RADISH_RUINS/MAIN": {
+    "locations": ["SHARD_8"],
+    "events": [],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  },
+
+  "REGION_DIMENSION_MIRROR/MAIN": {
+    "locations": [],
+    "events": [
+      "EVENT_DEFEAT_DARK_MIND",
+      "EVENT_100_PERCENT",
+      "EVENT_DEBUG_LOCATION"
+    ],
+    "exits": ["REGION_GAME_START"],
+    "warps": []
+  }
+}

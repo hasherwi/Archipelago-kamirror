@@ -5,11 +5,11 @@ from typing import Dict, FrozenSet, Set, Optional
 
 from BaseClasses import Item, ItemClassification
 
-from .data import BASE_OFFSET, data
+from .data import data
 
 
 class KirbyAmItem(Item):
-    game: str = " Kirby & The Amazing Mirror"
+    game: str = "Kirby & The Amazing Mirror"
     tags: FrozenSet[str]
 
     def __init__(self, name: str, classification: ItemClassification, code: Optional[int], player: int) -> None:
@@ -18,21 +18,8 @@ class KirbyAmItem(Item):
         if code is None:
             self.tags = frozenset(["Event"])
         else:
-            self.tags = data.items[reverse_offset_item_value(code)].tags
-
-
-def offset_item_value(item_value: int) -> int:
-    """
-    Returns the AP item id (code) for a given item value
-    """
-    return item_value + BASE_OFFSET
-
-
-def reverse_offset_item_value(item_id: int) -> int:
-    """
-    Returns the item value for a given AP item id (code)
-    """
-    return item_id - BASE_OFFSET
+            # data.items is keyed by the final AP item id (code).
+            self.tags = data.items[code].tags
 
 
 def create_item_label_to_code_map() -> Dict[str, int]:
@@ -40,8 +27,8 @@ def create_item_label_to_code_map() -> Dict[str, int]:
     Creates a map from item labels to their AP item id (code)
     """
     label_to_code_map: Dict[str, int] = {}
-    for item_value, attributes in data.items.items():
-        label_to_code_map[attributes.label] = offset_item_value(item_value)
+    for item_id, attributes in data.items.items():
+        label_to_code_map[attributes.label] = item_id
 
     return label_to_code_map
 
@@ -50,4 +37,4 @@ def get_item_classification(item_code: int) -> ItemClassification:
     """
     Returns the item classification for a given AP item id (code)
     """
-    return data.items[reverse_offset_item_value(item_code)].classification
+    return data.items[item_code].classification

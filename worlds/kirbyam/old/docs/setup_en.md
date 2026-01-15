@@ -1,4 +1,4 @@
-# Pokémon Emerald Setup Guide
+# Kirby & The Amazing Mirror Setup Guide
 
 ## Required Software
 
@@ -19,15 +19,9 @@ tabbed out of EmuHawk.
 - Consider clearing keybinds in `Config > Hotkeys…` if you don't intend to use them. Select the keybind and press Esc to
 clear it.
 
-## Optional Software
-
-- [Pokémon Emerald AP Tracker](https://github.com/seto10987/Archipelago-Emerald-AP-Tracker/releases/latest), for use with
-[PopTracker](https://github.com/black-sliver/PopTracker/releases)
-
 ## Generating and Patching a Game
 
-1. Create your options file (YAML). You can make one on the
-[Pokémon Emerald options page](../../../games/Pokemon%20Emerald/player-options).
+1. Create your options file (YAML).
 2. Follow the general Archipelago instructions for [generating a game](/tutorial/Archipelago/setup_en#generating-a-game).
 This will generate an output file for you. Your patch file will have the `.apemerald` file extension.
 3. Open `ArchipelagoLauncher.exe`
@@ -59,14 +53,3 @@ top text field of the client and click Connect.
 
 You should now be able to receive and send items. You'll need to do these steps every time you want to reconnect. It is
 perfectly safe to make progress offline; everything will re-sync when you reconnect.
-
-## Auto-Tracking
-
-Pokémon Emerald has a fully functional map tracker that supports auto-tracking.
-
-1. Download [Pokémon Emerald AP Tracker](https://github.com/seto10987/Archipelago-Emerald-AP-Tracker/releases/latest) and
-[PopTracker](https://github.com/black-sliver/PopTracker/releases).
-2. Put the tracker pack into packs/ in your PopTracker install.
-3. Open PopTracker, and load the Pokémon Emerald pack.
-4. For autotracking, click on the "AP" symbol at the top.
-5. Enter the Archipelago server address (the one you connected your client to), slot name, and password.

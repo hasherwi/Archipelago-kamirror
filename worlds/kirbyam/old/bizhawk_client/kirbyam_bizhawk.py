@@ -13,8 +13,43 @@ from typing import Any, Dict, Optional, Set, Tuple
 # The exact base class/AP client wiring varies by Archipelago version and your repo layout.
 # So: keep KirbyAM-specific logic encapsulated, and call these functions from your existing BizHawk client loop.
 
-
+from worlds._bizhawk.context import BizHawkClientContext
 from worlds.kirbyam.ram_config import KirbyAMRAMConfig, load_ram_config
+
+def _get_poc_slot(ctx: "BizHawkClientContext") -> dict[str, Any]:
+    slot = getattr(ctx, "slot_data", None)
+    if not isinstance(slot, dict):
+        raise ValueError("slot_data missing or invalid (expected dict).")
+
+    poc = slot.get("poc")
+    if not isinstance(poc, dict):
+        raise ValueError("slot_data['poc'] missing or invalid (expected dict).")
+
+    return poc
+
+
+def _require_int(m: dict[str, Any], key: str) -> int:
+    v = m.get(key)
+    if not isinstance(v, int):
+        raise ValueError(f"slot_data: expected int for '{key}', got {v!r}")
+    return v
+
+
+def _get_location_trigger(poc: dict[str, Any], name: str) -> tuple[int, int]:
+    """
+    Returns (location_id, room_value_na) for a named POC trigger.
+    """
+    locs = poc.get("locations")
+    if not isinstance(locs, dict):
+        raise ValueError("slot_data['poc']['locations'] missing/invalid (expected dict).")
+
+    entry = locs.get(name)
+    if not isinstance(entry, dict):
+        raise ValueError(f"slot_data['poc']['locations']['{name}'] missing/invalid (expected dict).")
+
+    location_id = _require_int(entry, "location_id")
+    room_value_na = _require_int(entry, "room_value_na")
+    return (location_id, room_value_na)
 
 
 class KirbyAMPlayablePOC:

@@ -1,1 +1,5 @@
-# Intentionally empty; marks this directory as a package for test discovery.
+from test.bases import WorldTestBase
+
+
+class PokemonEmeraldTestBase(WorldTestBase):
+    game = "Pokemon Emerald"

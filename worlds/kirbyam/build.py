@@ -144,7 +144,7 @@ def should_exclude(rel_posix: str) -> bool:
         return True
 
     # Skip build outputs / local-only items
-    if name.endswith(".apworld") or name.endswith(".zip"):
+    if name.endswith(".apworld") or name.endswith(".zip") or name.endswith(".gba"):
         return True
     if name in {".DS_Store", "Thumbs.db"}:
         return True

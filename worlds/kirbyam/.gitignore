@@ -1,0 +1,6 @@
+*.o
+*.elf
+*.bin
+*.gba
+kirby_ap_payload/.vscode/*
+kirby_ap_payload/.idea/*

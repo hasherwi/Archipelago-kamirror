@@ -10,7 +10,7 @@ class Goal(Choice):
     Determines what your goal is to consider the game beaten.
 
     - Dark Mind: Defeat Dark Mind and beat the game
-    - 100%: Achieve 100% completion of the save file
+    - 100% Save File: NOT READY --- Achieve 100% completion of the save file
     - DEBUG: A goal for testing purposes
     """
     display_name = "Goal"
@@ -36,7 +36,7 @@ class RandomizeShards(Choice):
 
 
 class KirbyAmDeathLink(DeathLink):
-    __doc__ = (DeathLink.__doc__ or "") + "\n\n    In Kirby & The Amazing Mirror, dying sets your current health to zero."
+    __doc__ = (DeathLink.__doc__ or "") + "\n\n    NOT READY YET: In Kirby & The Amazing Mirror, dying sets your current health to zero."
 
 
 @dataclass
